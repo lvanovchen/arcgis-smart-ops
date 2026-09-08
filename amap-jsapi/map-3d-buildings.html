@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>高德地图 3D 楼块演示</title>
+  <script src="https://webapi.amap.com/loader.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Microsoft YaHei', sans-serif; }
+    #container { width: 100%; height: 100vh; }
+    .control-panel {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: rgba(255, 255, 255, 0.95);
+      padding: 16px;
+      border-radius: 8px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+      z-index: 100;
+      min-width: 200px;
+    }
+    .control-panel h3 {
+      margin-bottom: 12px;
+      color: #333;
+      font-size: 16px;
+    }
+    .control-group {
+      margin-bottom: 12px;
+    }
+    .control-group label {
+      display: block;
+      margin-bottom: 4px;
+      color: #666;
+      font-size: 14px;
+    }
+    .control-group input[type="range"] {
+      width: 100%;
+    }
+    .btn-group {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .btn {
+      flex: 1;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 4px;
+      background: #1890ff;
+      color: white;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .btn:hover { background: #40a9ff; }
+    .btn.active { background: #13c2c2; }
+    .btn.danger { background: #ff4d4f; }
+    .btn.danger:hover { background: #ff7875; }
+  </style>
+</head>
+<body>
+  <div id="container"></div>
+  <div class="control-panel">
+    <h3>3D 地图控制</h3>
+    <div class="control-group">
+      <label>俯仰角 (pitch): <span id="pitchValue">45</span>°</label>
+      <input type="range" id="pitch" min="0" max="83" value="45">
+    </div>
+    <div class="control-group">
+      <label>旋转角 (rotation): <span id="rotationValue">0</span>°</label>
+      <input type="range" id="rotation" min="0" max="360" value="0">
+    </div>
+    <div class="control-group">
+      <label>缩放级别 (zoom): <span id="zoomValue">15</span></label>
+      <input type="range" id="zoom" min="10" max="20" value="15">
+    </div>
+    <div class="btn-group">
+      <button class="btn" onclick="toggleBuildings()">显示/隐藏楼块</button>
+      <button class="btn" onclick="toggleSatellite()">卫星图</button>
+    </div>
+    <div class="btn-group">
+      <button class="btn" onclick="resetView()">重置视角</button>
+      <button class="btn danger" onclick="flyToShanghai()">飞到上海</button>
+    </div>
+  </div>
+
+  <script>
+    window._AMapSecurityConfig = {
+      securityJsCode: '980346d1d0803cfc33f745dbc34c3aa4'
+    };
+
+    let map = null;
+    let buildings = null;
+    let satellite = null;
+    let roadNet = null;
+
+    AMapLoader.load({
+      key: 'd2f37d6346d286a5eb4709984a868472',
+      version: '2.0',
+      plugins: ['AMap.Scale', 'AMap.ToolBar']
+    }).then((AMap) => {
+      AMap.getConfig().appname = 'amap-jsapi-skill';
+
+      map = new AMap.Map('container', {
+        viewMode: '3D',
+        zoom: 15,
+        center: [121.4737, 31.2304],
+        pitch: 45,
+        rotation: 0
+      });
+
+      buildings = new AMap.Buildings({
+        zooms: [14, 20],
+        zIndex: 10,
+        heightFactor: 1.2
+      });
+      map.add(buildings);
+
+      buildings.setStyle({
+        hideWithoutStyle: false,
+        areas: [{
+          color1: '#6ec6ff',
+          color2: '#1a73e8',
+          path: [[121.45, 31.2], [121.5, 31.2], [121.5, 31.25], [121.45, 31.25]]
+        }]
+      });
+
+      map.addControl(new AMap.Scale());
+
+      map.on('pitchchange', () => {
+        document.getElementById('pitchValue').textContent = Math.round(map.getPitch());
+        document.getElementById('pitch').value = map.getPitch();
+      });
+
+      map.on('rotatechange', () => {
+        const rot = map.getRotation();
+        document.getElementById('rotationValue').textContent = Math.round(rot);
+        document.getElementById('rotation').value = rot;
+      });
+
+      map.on('zoomchange', () => {
+        document.getElementById('zoomValue').textContent = map.getZoom();
+        document.getElementById('zoom').value = map.getZoom();
+      });
+
+    }).catch(e => console.error(e));
+
+    document.getElementById('pitch').addEventListener('input', (e) => {
+      if (map) map.setPitch(Number(e.target.value));
+    });
+
+    document.getElementById('rotation').addEventListener('input', (e) => {
+      if (map) map.setRotation(Number(e.target.value));
+    });
+
+    document.getElementById('zoom').addEventListener('input', (e) => {
+      if (map) map.setZoom(Number(e.target.value));
+    });
+
+    function toggleBuildings() {
+      if (buildings) {
+        if (map.getAllOverlays('buildings').length > 0) {
+          map.remove(buildings);
+        } else {
+          map.add(buildings);
+        }
+      }
+    }
+
+    function toggleSatellite() {
+      if (!satellite) {
+        satellite = new AMap.TileLayer.Satellite();
+        roadNet = new AMap.TileLayer.RoadNet();
+      }
+      if (map.getAllOverlays('satellite').length > 0) {
+        map.remove(satellite);
+        map.remove(roadNet);
+      } else {
+        map.add(satellite);
+        map.add(roadNet);
+      }
+    }
+
+    function resetView() {
+      if (map) {
+        map.setPitch(45);
+        map.setRotation(0);
+        map.setZoom(15);
+        map.setCenter([121.4737, 31.2304]);
+      }
+    }
+
+    function flyToShanghai() {
+      if (map) {
+        map.setZoomAndCenter(15, [121.4737, 31.2304]);
+      }
+    }
+  </script>
+</body>
+</html>

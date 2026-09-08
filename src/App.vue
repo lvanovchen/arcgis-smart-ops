@@ -7,6 +7,11 @@
       <el-menu mode="horizontal" :router="true" :default-active="$route.path">
         <el-menu-item index="/">首页</el-menu-item>
         <el-menu-item index="/map">地图</el-menu-item>
+        <el-sub-menu index="tianditu">
+          <template #title>天地图</template>
+          <el-menu-item index="/tianditu-2d">2D 地图</el-menu-item>
+          <el-menu-item index="/tianditu-3d">3D 场景</el-menu-item>
+        </el-sub-menu>
         <el-menu-item index="/about">关于</el-menu-item>
       </el-menu>
     </el-header>
