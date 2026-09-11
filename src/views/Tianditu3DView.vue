@@ -175,17 +175,17 @@ onMounted(() => {
   view.on("click", (e) => {
     const point = e.mapPoint;
     if (!point) return;
-    const lon = point.longitude.toFixed(4);
-    const lat = point.latitude.toFixed(4);
-    const scale = view?.scale ? view.scale.toFixed(0) : "N/A";
-    const zoom = view?.zoom ? view.zoom.toFixed(0) : "N/A";
+    const lon = point.longitude?.toFixed(4) ?? "N/A";
+    const lat = point.latitude?.toFixed(4) ?? "N/A";
+    const scale = view?.scale != null ? view.scale.toFixed(0) : "N/A";
+    const zoom = view?.zoom != null ? view.zoom.toFixed(0) : "N/A";
     const camera = view?.camera;
-    const heading = camera ? camera.heading.toFixed(0) : "N/A";
-    const tilt = camera ? camera.tilt.toFixed(0) : "N/A";
+    const heading = camera?.heading != null ? camera.heading.toFixed(0) : "N/A";
+    const tilt = camera?.tilt != null ? camera.tilt.toFixed(0) : "N/A";
     const camPos = camera?.position;
-    const camLon = camPos ? camPos.longitude.toFixed(4) : "N/A";
-    const camLat = camPos ? camPos.latitude.toFixed(4) : "N/A";
-    const camZ = camPos ? camPos.z?.toFixed(0) || "N/A" : "N/A";
+    const camLon = camPos?.longitude != null ? camPos.longitude.toFixed(4) : "N/A";
+    const camLat = camPos?.latitude != null ? camPos.latitude.toFixed(4) : "N/A";
+    const camZ = camPos?.z != null ? camPos.z.toFixed(0) : "N/A";
     clickInfo.value = `坐标: ${lon}, ${lat}\nScale: 1:${scale}\nZoom: ${zoom}\nCameraPos: ${camLon}, ${camLat}, ${camZ}\nHeading: ${heading}\nTilt: ${tilt}`;
   });
 });

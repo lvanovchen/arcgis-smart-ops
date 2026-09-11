@@ -76,7 +76,7 @@ function addMarker(lon: number, lat: number, label: string) {
   graphicsLayer.add(new Graphic({
     geometry: { type: "point", longitude: lon, latitude: lat },
     symbol: { type: "simple-marker", color: [0, 122, 255], size: 14, outline: { color: [255, 255, 255], width: 2 } } as any,
-  }));
+  })); 
   graphicsLayer.add(new Graphic({
     geometry: { type: "point", longitude: lon, latitude: lat },
     symbol: {
@@ -162,10 +162,10 @@ onMounted(() => {
   view.on("click", (e) => {
     const point = e.mapPoint;
     if (!point) return;
-    const lon = point.longitude.toFixed(4);
-    const lat = point.latitude.toFixed(4);
-    const scale = view?.scale ? view.scale.toFixed(0) : "N/A";
-    const zoom = view?.zoom ? view.zoom.toFixed(0) : "N/A";
+    const lon = point.longitude?.toFixed(4) ?? "N/A";
+    const lat = point.latitude?.toFixed(4) ?? "N/A";
+    const scale = view?.scale != null ? view.scale.toFixed(0) : "N/A";
+    const zoom = view?.zoom != null ? view.zoom.toFixed(0) : "N/A";
     const srWkid = view?.spatialReference?.wkid || e.mapPoint?.spatialReference?.wkid || "N/A";
     clickInfo.value = `坐标: ${lon}, ${lat}\nScale: 1:${scale}\nZoom: ${zoom}\n空间参考: WKID ${srWkid}`;
   });
