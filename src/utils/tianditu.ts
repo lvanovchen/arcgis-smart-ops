@@ -1,6 +1,6 @@
 import WebTileLayer from "@arcgis/core/layers/WebTileLayer.js";
 
-const TIANDITU_KEY = "e6d33e5510e72c75e414aeff0a92ab00";
+const TIANDITU_KEY = "726712a443b3fd009f46a916e010723e";
 
 type TiandituType = "vec" | "img" | "ter";
 
